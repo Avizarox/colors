@@ -560,6 +560,8 @@ MonoBehaviour:
   moveSpeed: 8
   jumpForce: 20
   slideForce: 20
+  slideAttenuation: 0.05
+  slideDuration: 0.5
   groundCheckRadius: 0.2
   sideCheckRadius: 0.1
   groundLayer:
@@ -699,7 +701,7 @@ SpriteRenderer:
   m_SortingOrder: 0
   m_Sprite: {fileID: 6128299156075563123, guid: 628ebb085e59cdb4b9ed0cf3bea2cd25, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 0
+  m_FlipX: 1
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 1.375, y: 1.375}
