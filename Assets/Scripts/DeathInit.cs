@@ -8,6 +8,7 @@ public class DeathInit : MonoBehaviour
     public Sprite sprite;
     public Transform spawnPoint;
     public float respawnTime = 1.5f;
+    public float critTime = 5.0f;
 
     private GameObject player;
     private SpriteRenderer spriteRendered;
@@ -44,7 +45,9 @@ public class DeathInit : MonoBehaviour
 
     IEnumerator Respawn()
     {
-        yield return new WaitForSeconds(1.5f);
+        TimerManager.Instance.ReduceTime(critTime);
+
+        yield return new WaitForSeconds(1.0f);
 
         health = 1;
         player.transform.position = spawnPoint.position;
