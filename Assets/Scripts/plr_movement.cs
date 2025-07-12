@@ -1,80 +1,72 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D))]
-[RequireComponent(typeof(PlayerInput))]
-public class PlayerController2D : MonoBehaviour
+public class PlatformerController : MonoBehaviour
 {
     [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 8f;
-    [SerializeField] private float jumpForce = 12f;
-    [SerializeField] private float groundCheckRadius = 0.2f;
+    [SerializeField] private float jumpForce = 20f;
+    [SerializeField] private float slideForce = 20f;
+    [SerializeField] private float groundCheckRadius = 0.05f, sideCheckRadius = 0.1f;
 
     [Header("References")]
-    [SerializeField] private Transform groundCheck;
     [SerializeField] private LayerMask groundLayer;
 
     private Rigidbody2D rb;
-    private PlayerInput playerInput;
-    private InputAction moveAction;
-    private InputAction jumpAction;
-
-    private Vector2 moveInput;
-    private bool isGrounded;
+    private int dir = 1;
+    //private float horizontalInput;
+    private bool isGrounded, isRightBlocked, isLeftBlocked;
     private bool isFacingRight = true;
+    private bool jumpRequested, slideRequested;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        playerInput = GetComponent<PlayerInput>();
-
-        // ???????? ?????? ?? ????????
-        moveAction = playerInput.actions["Move"];
-        jumpAction = playerInput.actions["Jump"];
-    }
-
-    private void OnEnable()
-    {
-        // ????????????? ?? ??????? ?????
-        jumpAction.performed += OnJump;
-    }
-
-    private void OnDisable()
-    {
-        // ???????????? ?? ??????? ?????
-        jumpAction.performed -= OnJump;
     }
 
     private void Update()
     {
-        // ????????? ???? ????????
-        moveInput = moveAction.ReadValue<Vector2>();
+        //horizontalInput = Input.GetAxisRaw("Horizontal");
 
-        // ???????? ?????????? ?? ?????
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+        if (Input.GetButtonDown("Jump") && isGrounded)
+        {
+            jumpRequested = true;
+        }
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            slideRequested = true;
+        }
 
-        // ???????? ?????????
-        if (moveInput.x > 0 && !isFacingRight)
-        {
-            Flip();
-        }
-        else if (moveInput.x < 0 && isFacingRight)
-        {
-            Flip();
-        }
+        isGrounded = Physics2D.OverlapCircle(transform.position + new Vector3(0f, -0.6f, 0f), groundCheckRadius, groundLayer);
+        isLeftBlocked = Physics2D.OverlapCircle(transform.position + new Vector3(-0.5f, 0f, 0f), sideCheckRadius, groundLayer);
+        isRightBlocked = Physics2D.OverlapCircle(transform.position + new Vector3(0.5f, 0f, 0f), sideCheckRadius, groundLayer);
     }
 
     private void FixedUpdate()
     {
-        // ????????? ???????? ? FixedUpdate ??? ??????
-        rb.linearVelocity = new Vector2(moveInput.x * moveSpeed, rb.linearVelocity.y);
-    }
-
-    private void OnJump(InputAction.CallbackContext context)
-    {
-        if (isGrounded)
+        if (isLeftBlocked && dir != 1)
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            dir = 1;
+            Flip();
+        }
+        else if (isRightBlocked && dir != -1)
+        {
+            dir = -1;
+            Flip();
+        }
+
+        rb.linearVelocity = new Vector2(dir * moveSpeed, rb.linearVelocity.y);
+
+        if (jumpRequested)
+        {
+            rb.AddForce(new Vector2(0f, jumpForce), ForceMode2D.Impulse);
+            jumpRequested = false;
+            isGrounded = false;
+        }
+        if (slideRequested)
+        {
+            rb.AddForce(new Vector2(dir*slideForce, 0), ForceMode2D.Impulse);
+            slideRequested = false;
         }
     }
 
@@ -86,13 +78,4 @@ public class PlayerController2D : MonoBehaviour
         transform.localScale = scale;
     }
 
-    // ???????????? ???? ???????? ????? ? ?????????
-    private void OnDrawGizmosSelected()
-    {
-        if (groundCheck != null)
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
-        }
-    }
 }
