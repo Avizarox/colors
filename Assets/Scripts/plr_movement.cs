@@ -63,6 +63,7 @@ public class PlatformerController : MonoBehaviour
             jumpRequested = false;
             isGrounded = false;
         }
+
         if (slideRequested)
         {
             rb.AddForce(new Vector2(dir*slideForce, 0), ForceMode2D.Impulse);
