@@ -7,16 +7,17 @@ public class PlatformerController : MonoBehaviour
     [SerializeField] private float moveSpeed = 8f;
     [SerializeField] private float jumpForce = 20f;
     [SerializeField] private float slideForce = 20f; //Изначальная сила слайда
-    [SerializeField] private float slideAttenuation= 0.05f; //Чем меньше тем медленее затухает сила слайда
+    [SerializeField] private float slideAttenuation = 0.05f; //Чем меньше тем медленее затухает сила слайда
     [SerializeField] private float slideDuration = 0.5f; // сколько длится слайд
-    [SerializeField] private float groundCheckRadius = 0.05f, sideCheckRadius = 0.1f;
+    [SerializeField] private float groundCheckRadius = 0.1f, sideCheckRadius = 0.1f;
 
     [Header("References")]
-    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private LayerMask groundLayer, blueLayer, redLayer;
 
+    private DeathInit deathInit;
     private Rigidbody2D rb;
     private int dir = 1;
-    private bool isGrounded, isRightBlocked, isLeftBlocked;
+    private bool isGrounded, isRightBlocked, isLeftBlocked, isOnBlue, isOnRed;
     private bool isFacingRight = true;
     private bool jumpRequested, slideRequested;
     private bool wasGrounded;
@@ -26,20 +27,27 @@ public class PlatformerController : MonoBehaviour
 
     private Animator animator;
 
+    private Vector2 boxSize = new Vector2(1f, 0.2f);
+
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
+        deathInit = GetComponent<DeathInit>();
     }
 
     private void Update()
     {
         wasGrounded = isGrounded;
 
-        isGrounded = Physics2D.OverlapCircle(transform.position + new Vector3(0f, -0.6f, 0f), groundCheckRadius, groundLayer);
-        isLeftBlocked = Physics2D.OverlapCircle(transform.position + new Vector3(-0.5f, 0f, 0f), sideCheckRadius, groundLayer);
-        isRightBlocked = Physics2D.OverlapCircle(transform.position + new Vector3(0.5f, 0f, 0f), sideCheckRadius, groundLayer);
+        isGrounded = Physics2D.OverlapBox(transform.position + new Vector3(0f, -0.6f, 0f), boxSize, 0f, groundLayer | blueLayer | redLayer);
+
+        isOnBlue = Physics2D.OverlapBox(transform.position + new Vector3(0f, -0.5f, 0f), boxSize, 0f, blueLayer);
+        isOnRed = Physics2D.OverlapBox(transform.position + new Vector3(0f, -0.5f, 0f), boxSize, 0f, redLayer);
+
+        isLeftBlocked = Physics2D.OverlapCircle(transform.position + new Vector3(-0.5f, 0f, 0f), sideCheckRadius, groundLayer) && !isSliding;
+        isRightBlocked = Physics2D.OverlapCircle(transform.position + new Vector3(0.5f, 0f, 0f), sideCheckRadius, groundLayer) && !isSliding;
 
         if (!wasGrounded && isGrounded)
         {
@@ -52,9 +60,18 @@ public class PlatformerController : MonoBehaviour
             jumpRequested = true;
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftControl) && isGrounded && !isSliding)
+        if (Input.GetKeyDown(KeyCode.LeftControl) && !isSliding)
         {
             slideRequested = true;
+        }
+
+        if(isOnBlue && dozaTaker.lastPickedItem.Color == dozaTaker.colors.red)
+        {
+            deathInit.TakeDamage(1);
+        }
+        if(isOnRed && dozaTaker.lastPickedItem.Color == dozaTaker.colors.blue)
+        {
+            deathInit.TakeDamage(1);
         }
     }
 
