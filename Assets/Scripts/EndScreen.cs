@@ -24,5 +24,7 @@ public class EndScreen : MonoBehaviour
         yield return new WaitForSeconds(10.0f);
 
         spriteRenderer.enabled = false;
+
+        SpawnPoint.ResetSpawnPoints();
     }
 }
