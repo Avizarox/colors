@@ -1,11 +1,15 @@
+using System.Collections;
 using UnityEngine;
 
-public class dozaTaker : MonoBehaviour
+public class DozaTaker : MonoBehaviour
 {
     private SpriteRenderer _char;
     public enum colors { red, blue }
 
     public static Item lastPickedItem;
+
+    private Coroutine dozaTimerCoroutine;
+    public float dozaDuration = 5f;
 
     private void Start()
     {
@@ -31,15 +35,20 @@ public class dozaTaker : MonoBehaviour
         if (other.CompareTag("Collectible"))
         {
             Item newItem = GetItemInfo(other.gameObject);
-
             lastPickedItem = newItem;
+
+            if (dozaTimerCoroutine != null)
+            {
+                StopCoroutine(dozaTimerCoroutine);
+            }
+            dozaTimerCoroutine = StartCoroutine(DozaDurationTimer());
 
             Destroy(other.gameObject);
 
             if (newItem.Color == colors.red) _char.color = Color.red;
             else if (newItem.Color == colors.blue) _char.color = Color.blue;
 
-            Debug.Log(newItem.Color);
+            Debug.Log("Picked: " + newItem.Color);
         }
     }
 
@@ -65,5 +74,14 @@ public class dozaTaker : MonoBehaviour
     public Item GetLastPickedItem()
     {
         return lastPickedItem;
+    }
+
+    IEnumerator DozaDurationTimer()
+    {
+        yield return new WaitForSeconds(dozaDuration);
+
+        lastPickedItem = null;
+        _char.color = Color.white;
+        Debug.Log("Доза закончилась");
     }
 }

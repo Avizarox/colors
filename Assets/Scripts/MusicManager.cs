@@ -17,6 +17,15 @@ public class MusicManager : MonoBehaviour
 
     void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
         audioSource = GetComponent<AudioSource>();
         audioSource.volume = 0.6f;
     }
@@ -66,5 +75,12 @@ public class MusicManager : MonoBehaviour
         audioSource.volume = 0.6f;
         isPlayingSecret = false;
         StartLoop();
+    }
+
+    public void StopMusic()
+    {
+        CancelInvoke();
+        audioSource.Stop();
+        isPlayingSecret = false;
     }
 }

@@ -1,8 +1,12 @@
 using UnityEngine;
+using UnityEngine.Audio;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlatformerController : MonoBehaviour
 {
+    public AudioClip jumpSound;
+    private AudioSource audioSource;
+
     [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 8f;
     [SerializeField] private float jumpForce = 20f;
@@ -35,6 +39,7 @@ public class PlatformerController : MonoBehaviour
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         deathInit = GetComponent<DeathInit>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -65,11 +70,12 @@ public class PlatformerController : MonoBehaviour
             slideRequested = true;
         }
 
-        if(isOnBlue && dozaTaker.lastPickedItem.Color == dozaTaker.colors.red)
+        if (isOnBlue && (DozaTaker.lastPickedItem == null || DozaTaker.lastPickedItem.Color == DozaTaker.colors.red))
         {
             deathInit.TakeDamage(1);
         }
-        if(isOnRed && dozaTaker.lastPickedItem.Color == dozaTaker.colors.blue)
+
+        if (isOnRed && (DozaTaker.lastPickedItem == null || DozaTaker.lastPickedItem.Color == DozaTaker.colors.blue))
         {
             deathInit.TakeDamage(1);
         }
@@ -116,6 +122,14 @@ public class PlatformerController : MonoBehaviour
 
         if (jumpRequested)
         {
+            if (jumpSound != null && jumpSound.length > 0f)
+            {
+                audioSource.clip = jumpSound;
+                audioSource.volume = 0.3f;
+                audioSource.loop = false;
+                audioSource.Play();
+            }
+
             rb.AddForce(new Vector2(0f, jumpForce), ForceMode2D.Impulse);
             jumpRequested = false;
             isGrounded = false;

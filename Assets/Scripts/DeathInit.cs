@@ -1,9 +1,13 @@
 using System.Collections;
 using System.Security.Cryptography;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class DeathInit : MonoBehaviour
 {
+    public AudioClip deathSound;
+    private AudioSource audioSource;
+
     public int health = 1;
     public Sprite sprite;
     public Transform spawnPoint;
@@ -23,6 +27,7 @@ public class DeathInit : MonoBehaviour
         animator = player.GetComponent<Animator>();
         rb = player.GetComponent<Rigidbody2D>();
         platformerController = GetComponent<PlatformerController>();
+        audioSource = GetComponent<AudioSource>();
 
     }
 
@@ -30,15 +35,25 @@ public class DeathInit : MonoBehaviour
     {
         health -= damage;
 
-        if(health <= 0)
+        if (health <= 0)
         {
+            if (deathSound != null && deathSound.length > 0f)
+            {
+                audioSource.clip = deathSound;
+                audioSource.volume = 0.2f;
+                audioSource.loop = false;
+                audioSource.Play();
+            }
+
             animator.enabled = false;
             platformerController.enabled = false;
             rb.simulated = false;
             spriteRendered.sprite = sprite;
 
             StartCoroutine(Respawn());
-        } else {
+        }
+        else
+        {
             return;
         }
     }
