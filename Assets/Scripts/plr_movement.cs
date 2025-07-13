@@ -21,7 +21,7 @@ public class PlatformerController : MonoBehaviour
     private bool jumpRequested, slideRequested;
     private bool wasGrounded;
 
-    private bool isSliding = false;
+    public bool isSliding = false;
     private float slideTimer = 0f;
 
     private Animator animator;
