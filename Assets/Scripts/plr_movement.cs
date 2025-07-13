@@ -7,7 +7,7 @@ public class PlatformerController : MonoBehaviour
     [SerializeField] private float moveSpeed = 8f;
     [SerializeField] private float jumpForce = 20f;
     [SerializeField] private float slideForce = 20f; //Изначальная сила слайда
-    [SerializeField] private float slideAttenuation= 0.05f; //Чем меньше тем медленее затухает сила слайда
+    [SerializeField] private float slideAttenuation = 0.05f; //Чем меньше тем медленее затухает сила слайда
     [SerializeField] private float slideDuration = 0.5f; // сколько длится слайд
     [SerializeField] private float groundCheckRadius = 0.05f, sideCheckRadius = 0.1f;
 
