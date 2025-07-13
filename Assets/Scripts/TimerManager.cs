@@ -64,6 +64,11 @@ public class TimerManager : MonoBehaviour
         timer.text = timeRemaining.ToString("F0");
     }
 
+    public void WinTime()
+    {
+        timeRemaining = 20f;
+    }
+
     IEnumerator MyCoroutine()
     {
         yield return new WaitForSeconds(1.0f);
