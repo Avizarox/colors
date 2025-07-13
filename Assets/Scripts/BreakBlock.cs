@@ -9,7 +9,7 @@ public class BreakBlock : MonoBehaviour
 
     private void Start()
     {
-        GetComponent<SpriteRenderer>().sortingOrder = 10;
+        GetComponent<SpriteRenderer>().sortingOrder = 2;
         platformerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlatformerController>();
         animator = GetComponent<Animator>();
     }
